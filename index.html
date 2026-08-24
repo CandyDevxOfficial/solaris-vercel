@@ -12,7 +12,6 @@
             --card-bg: rgba(15, 20, 32, 0.75);
             --primary: #ff5722;
             --primary-glow: rgba(255, 87, 34, 0.45);
-            --accent-purple: #8b5cf6;
             --border-light: rgba(255, 255, 255, 0.1);
             --text-main: #f9fafb;
             --text-sub: #9ca3af;
@@ -105,28 +104,12 @@
         .btn-403:hover { transform: translateY(-2px); }
 
         .brand-header { text-align: center; margin-bottom: 24px; }
-        .brand-title {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: #ff5722;
-        }
+        .brand-title { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; color: #ff5722; }
         .brand-sub { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
 
         .form-group { margin-bottom: 20px; }
-        .editor-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .label-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #d1d5db;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        .editor-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .label-title { font-size: 11px; font-weight: 700; color: #d1d5db; letter-spacing: 1px; text-transform: uppercase; }
         .btn-mini-group { display: flex; gap: 8px; }
         .btn-mini {
             background: rgba(255, 255, 255, 0.06);
@@ -151,100 +134,49 @@
             padding: 14px;
             transition: all 0.3s;
         }
-        .editor-wrapper:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
+        .editor-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
         textarea {
-            width: 100%;
-            height: 180px;
-            background: transparent;
-            border: none;
-            color: #00f2fe;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            outline: none;
-            resize: vertical;
-            line-height: 1.6;
+            width: 100%; height: 180px; background: transparent; border: none;
+            color: #00f2fe; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            outline: none; resize: vertical; line-height: 1.6;
         }
 
-        .editor-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 18px;
-        }
+        .editor-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; }
         .char-counter { font-size: 12px; color: var(--text-sub); font-family: 'JetBrains Mono', monospace; }
 
         .btn-submit {
             background: linear-gradient(135deg, #ff5722, #e64a19);
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 22px;
-            font-size: 13.5px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 20px var(--primary-glow);
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: #ffffff; border: none; border-radius: 12px; padding: 12px 22px;
+            font-size: 13.5px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px var(--primary-glow); transition: all 0.25s ease;
+            display: flex; align-items: center; gap: 8px;
         }
         .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255, 87, 34, 0.7); }
 
         .result-box {
-            display: none;
-            margin-top: 24px;
-            padding-top: 20px;
+            display: none; margin-top: 24px; padding-top: 20px;
             border-top: 1px dashed rgba(255, 255, 255, 0.15);
             animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .code-display {
-            background: rgba(3, 7, 18, 0.95);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            border-radius: 12px;
-            padding: 14px;
-            color: var(--code-green);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            word-break: break-all;
-            margin-top: 8px;
-            margin-bottom: 14px;
+            background: rgba(3, 7, 18, 0.95); border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: 12px; padding: 14px; color: var(--code-green);
+            font-family: 'JetBrains Mono', monospace; font-size: 12px;
+            word-break: break-all; margin-top: 8px; margin-bottom: 14px;
         }
 
-        .action-btn-group {
-            display: flex;
-            gap: 10px;
-        }
-
+        .action-btn-group { display: flex; gap: 10px; }
         .btn-copy-main {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--border-light);
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            flex: 1; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-light);
+            color: var(--text-main); padding: 12px; border-radius: 12px; font-weight: 600;
+            font-size: 13px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-copy-main:hover { background: rgba(255, 255, 255, 0.16); }
-        .btn-copy-script {
-            background: rgba(255, 87, 34, 0.15);
-            border: 1px solid rgba(255, 87, 34, 0.4);
-            color: #ff8a65;
-        }
-        .btn-copy-script:hover {
-            background: rgba(255, 87, 34, 0.3);
-        }
+        .btn-copy-script { background: rgba(255, 87, 34, 0.15); border: 1px solid rgba(255, 87, 34, 0.4); color: #ff8a65; }
+        .btn-copy-script:hover { background: rgba(255, 87, 34, 0.3); }
     </style>
 </head>
 <body>
@@ -378,11 +310,8 @@ function copyRawScript() {
     });
 }
 
-function goHome() {
-    window.location.href = '/';
-}
+function goHome() { window.location.href = '/'; }
 </script>
-
 </body>
     </html>
     
