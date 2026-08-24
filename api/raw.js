@@ -1,49 +1,55 @@
-const FETCH_URL = process.env.UPSTASH_REDIS_REST_URL;
-const FETCH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // เพิ่มขีดจำกัดขนาดข้อมูลเป็น 10MB รองรับข้อความได้หลายล้านตัวอักษร
+    },
+  },
+};
 
 export default async function handler(req, res) {
-    const { id } = req.query;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-    if (req.method === 'POST') {
-        try {
-            const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-            if (!body.code) return res.status(400).send('No code provided');
+  const FETCH_URL = process.env.UPSTASH_REDIS_REST_URL;
+  const FETCH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-            const scriptId = Math.random().toString(36).substring(2, 10);
+  if (!FETCH_URL || !FETCH_TOKEN) {
+    return res.status(500).json({ error: 'Missing Redis Environment Variables' });
+  }
 
-            await fetch(`${FETCH_URL}/set/${scriptId}`, {
-                headers: { Authorization: `Bearer ${FETCH_TOKEN}` },
-                method: 'POST',
-                body: JSON.stringify(body.code)
-            });
-
-            return res.status(200).json({ id: scriptId });
-        } catch (e) {
-            return res.status(500).send('Database Error');
-        }
+  try {
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    
+    if (!body || !body.code) {
+      return res.status(400).json({ error: 'No code provided' });
     }
 
-    if (req.method === 'GET') {
-        const userAgent = req.headers['user-agent'] || '';
+    // สุ่มสร้าง ID ความยาว 8 หลัก
+    const scriptId = Math.random().toString(36).substring(2, 10);
 
-        // บล็อกเบราว์เซอร์ ป้องกันคนแอบเปิดเอาสคริปต์
-        if (userAgent.includes('Mozilla') && !userAgent.includes('Roblox')) {
-            return res.status(403).send('<h1 style="color:#ff5722;text-align:center;margin-top:50px;">403 Access Denied</h1>');
-        }
+    // ยิง API บันทึกลง Upstash Redis
+    const redisResponse = await fetch(`${FETCH_URL}/set/raw:${scriptId}`, {
+      headers: {
+        Authorization: `Bearer ${FETCH_TOKEN}`,
+        'Content-Type': 'text/plain',
+      },
+      method: 'POST',
+      body: body.code,
+    });
 
-        const response = await fetch(`${FETCH_URL}/get/${id}`, {
-            headers: { Authorization: `Bearer ${FETCH_TOKEN}` }
-        });
-        const data = await response.json();
-
-        if (!data.result) {
-            return res.status(404).send('-- Script not found or expired');
-        }
-
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        return res.status(200).send(data.result);
+    if (!redisResponse.ok) {
+      return res.status(500).json({ error: 'Failed to store code in Upstash' });
     }
 
-    return res.status(405).send('Method Not Allowed');
+    const host = req.headers.host;
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const rawUrl = `${protocol}://${host}/api/get?id=${scriptId}`;
+    const loadstring = `loadstring(game:HttpGet("${rawUrl}"))()`;
+
+    return res.status(200).json({ loadstring, rawUrl });
+
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to convert script' });
+  }
 }
-  
