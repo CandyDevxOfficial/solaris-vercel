@@ -1,7 +1,7 @@
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '10mb', // เพิ่มขีดจำกัดขนาดข้อมูลเป็น 10MB รองรับข้อความได้หลายล้านตัวอักษร
+      sizeLimit: '10mb',
     },
   },
 };
@@ -25,10 +25,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No code provided' });
     }
 
-    // สุ่มสร้าง ID ความยาว 8 หลัก
     const scriptId = Math.random().toString(36).substring(2, 10);
 
-    // ยิง API บันทึกลง Upstash Redis
     const redisResponse = await fetch(`${FETCH_URL}/set/raw:${scriptId}`, {
       headers: {
         Authorization: `Bearer ${FETCH_TOKEN}`,
@@ -44,7 +42,7 @@ export default async function handler(req, res) {
 
     const host = req.headers.host;
     const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const rawUrl = `${protocol}://${host}/api/get?id=${scriptId}`;
+    const rawUrl = `${protocol}://${host}/raw/${scriptId}`;
     const loadstring = `loadstring(game:HttpGet("${rawUrl}"))()`;
 
     return res.status(200).json({ loadstring, rawUrl });
@@ -53,3 +51,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to convert script' });
   }
 }
+  
