@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poskidsni Hub Script Obfuscator / Raw Link</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid #333;
+        }
+        h2 {
+            margin-top: 0;
+            color: #00e676;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 220px;
+            background-color: #2a2a2a;
+            color: #00ff66;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #00e676;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #00c853;
+        }
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        .result-box {
+            margin-top: 20px;
+            display: none;
+            background-color: #262626;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00e676;
+        }
+        .result-box code {
+            word-break: break-all;
+            color: #fff;
+            font-family: monospace;
+            display: block;
+            background: #181818;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Poskidsni Hub Generator</h2>
+    <p style="text-align: center; color: #aaa; font-size: 14px;">วางสคริปต์ Roblox ของคุณเพื่อแปลงเป็น Loadstring (รันได้ 24 ชม.)</p>
+    
+    <textarea id="rawCode" placeholder="วางสคริปต์ Roblox Lua ตรงนี้..."></textarea>
+    <button id="submitBtn" onclick="convertScript()">Convert Script</button>
+
+    <div id="resultArea" class="result-box">
+        <strong>คัดลอก Loadstring ไปใช้ใน Roblox:</strong>
+        <code id="loadstringBox"></code>
+    </div>
+</div>
+
+<script>
+async function convertScript() {
+    const code = document.getElementById('rawCode').value.trim();
+    if (!code) return alert('กรุณาใส่สคริปต์ก่อนครับ');
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = 'Converting...';
+
+    try {
+        const response = await fetch('/api/raw', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            const rawUrl = `${window.location.origin}/raw/${data.id}`;
+            document.getElementById('loadstringBox').innerText = `loadstring(game:HttpGet("${rawUrl}"))()`;
+            document.getElementById('resultArea').style.display = 'block';
+        } else {
+            alert('เกิดข้อผิดพลาดในการบันทึกสคริปต์');
+        }
+    } catch (err) {
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Convert Script';
+    }
+}
+</script>
+
+</body>
+  </html>
+  
