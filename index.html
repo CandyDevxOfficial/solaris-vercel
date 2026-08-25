@@ -18,6 +18,7 @@
             --text-main: #f9fafb;
             --text-sub: #9ca3af;
             --code-green: #10b981;
+            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -102,6 +103,24 @@
             margin-top: 10px;
             display: none;
             animation: fadeIn 0.2s ease-out;
+        }
+        .custom-input-group {
+            display: flex; gap: 8px; align-items: center;
+        }
+        .btn-delete-custom {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: var(--danger);
+            padding: 12px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-delete-custom:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
         }
 
         .switch-group {
@@ -208,7 +227,12 @@
                     <option value="Other">อื่นๆ (พิมพ์ระบุเอง)</option>
                 </select>
                 <div class="custom-game-box" id="customGameBox">
-                    <input type="text" id="customGameInput" placeholder="พิมพ์ชื่อเกม/หมวดหมู่ที่คุณต้องการ...">
+                    <div class="custom-input-group">
+                        <input type="text" id="customGameInput" placeholder="พิมพ์ชื่อหมวดหมู่ที่ต้องการ...">
+                        <button type="button" class="btn-delete-custom" onclick="clearCustomCategory()" title="ลบหมวดหมู่นี้">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -262,6 +286,17 @@ function toggleCustomGameInput() {
     } else {
         customBox.style.display = 'none';
     }
+}
+
+function clearCustomCategory() {
+    const customInput = document.getElementById('customGameInput');
+    const select = document.getElementById('scriptGame');
+    
+    // ล้างข้อความ พลิกกลับไปเลือก General และซ่อนช่องกรอก
+    customInput.value = '';
+    select.value = 'General';
+    toggleCustomGameInput();
+    showToast('Custom Category Removed!');
 }
 
 function switchTab(tab) {
