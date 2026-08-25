@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLARIS RUNNER - Poskidsni Hub</title>
+    <title>SOLARIS HUB - Script Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -49,12 +49,7 @@
             100% { transform: translate(50px, 70px) scale(1.15); } 
         }
 
-        .container {
-            width: 100%;
-            max-width: 650px;
-            z-index: 10;
-        }
-
+        .container { width: 100%; max-width: 650px; z-index: 10; }
         .brand-header { text-align: center; margin-bottom: 24px; }
         .brand-title { font-size: 32px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(135deg, #ff5722, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .brand-sub { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
@@ -102,6 +97,12 @@
             border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow);
         }
         textarea { height: 160px; font-family: 'JetBrains Mono', monospace; resize: vertical; line-height: 1.5; color: #00f2fe; }
+
+        .custom-game-box {
+            margin-top: 10px;
+            display: none;
+            animation: fadeIn 0.2s ease-out;
+        }
 
         .switch-group {
             display: flex; align-items: center; justify-content: space-between;
@@ -181,8 +182,8 @@
 
 <div class="container">
     <div class="brand-header">
-        <div class="brand-title">SOLARIS RUNNER</div>
-        <div class="brand-sub">Poskidsni Hub Script Engine</div>
+        <div class="brand-title">SOLARIS HUB</div>
+        <div class="brand-sub">Official Executable Script Engine</div>
     </div>
 
     <div class="nav-tabs">
@@ -200,12 +201,15 @@
 
             <div class="form-group">
                 <label class="label-title">Game Category</label>
-                <select id="scriptGame">
+                <select id="scriptGame" onchange="toggleCustomGameInput()">
                     <option value="General">General / Other Games</option>
                     <option value="Build A Boat">Build A Boat For Treasure</option>
                     <option value="Identity Fraud">Identity Fraud</option>
-                    <option value="Murder Mystery 2">Murder Mystery 2</option>
+                    <option value="Other">อื่นๆ (พิมพ์ระบุเอง)</option>
                 </select>
+                <div class="custom-game-box" id="customGameBox">
+                    <input type="text" id="customGameInput" placeholder="พิมพ์ชื่อเกม/หมวดหมู่ที่คุณต้องการ...">
+                </div>
             </div>
 
             <div class="form-group">
@@ -250,6 +254,16 @@
 <div class="toast" id="toast">Copied to Clipboard!</div>
 
 <script>
+function toggleCustomGameInput() {
+    const select = document.getElementById('scriptGame');
+    const customBox = document.getElementById('customGameBox');
+    if (select.value === 'Other') {
+        customBox.style.display = 'block';
+    } else {
+        customBox.style.display = 'none';
+    }
+}
+
 function switchTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -275,7 +289,14 @@ let publicScripts = [];
 
 async function createRaw() {
     const title = document.getElementById('scriptTitle').value.trim() || 'Untitled Script';
-    const game = document.getElementById('scriptGame').value;
+    const selectedGame = document.getElementById('scriptGame').value;
+    
+    let game = selectedGame;
+    if (selectedGame === 'Other') {
+        const customGame = document.getElementById('customGameInput').value.trim();
+        game = customGame !== '' ? customGame : 'Other';
+    }
+
     const code = document.getElementById('rawCode').value.trim();
     const isPublic = document.getElementById('isPublic').checked;
 
@@ -373,4 +394,5 @@ async function copyHubLoadstring(id, btn) {
 }
 </script>
 </body>
-</html>
+    </html>
+    
