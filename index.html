@@ -291,19 +291,16 @@
 <script>
 // ==================== ระบบตรวจสอบว่าข้อความใช่โค้ดหรือไม่ ====================
 function isLuaCode(text) {
-    if (!text || text.trim().length === 0) return false;
+    if (!text || text.trim().length < 5) return false; // ความยาวต้องอย่างน้อย 5 ตัวอักษร
     
-    // คีย์เวิร์ดโครงสร้าง Lua & Roblox Script
+    // คีย์เวิร์ดมาตรฐานของ Lua และ Roblox Script
     const luaKeywords = [
         "local ", "function", "end", "return", "if ", "then", "else", 
         "game:", "game.", "workspace", "Instance.new", "Vector3", 
-        "CFrame", "wait(", "task.wait", "require(", "print(", "=", "getgenv", "loadstring"
+        "CFrame", "wait(", "task.wait", "require(", "print(", "getgenv", "loadstring"
     ];
 
-    const hasKeywords = luaKeywords.some(keyword => text.includes(keyword));
-    const hasCodeSymbols = /[{}()\[\]=+\-*/;:.]/.test(text);
-
-    return hasKeywords || hasCodeSymbols;
+    return luaKeywords.some(keyword => text.includes(keyword));
 }
 
 function toggleCustomGameInput() {
@@ -362,11 +359,11 @@ async function createRaw() {
     const code = document.getElementById('rawCode').value.trim();
     const isPublic = document.getElementById('isPublic').checked;
 
-    // ❌ ตรวจเช็กก่อนส่ง: ถ้าไม่ใช่โค้ดจะเด้งปฏิเสธทันที
     if (!code) {
         return alert('กรุณาใส่โค้ดสคริปต์!');
     }
     
+    // ตรวจสอบว่าใช่โค้ด Lua จริงหรือไม่
     if (!isLuaCode(code)) {
         return alert('❌ Error: ข้อมูลที่พิมพ์ไม่ใช่โค้ดสคริปต์! ระบบอนุญาตให้ส่งเฉพาะโค้ดสคริปต์เท่านั้น');
     }
@@ -415,15 +412,38 @@ async function loadPublicHub() {
     }
 }
 
-// 🧹 ระบบสแกนและลบข้อความที่ไม่ใช่โค้ดออกจาก Public Hub
-function cleanNonCodePublic() {
-    const initialCount = publicScripts.length;
-    // กรองเอาเฉพาะสคริปต์ที่เป็นโค้ดแท้จริง
-    publicScripts = publicScripts.filter(s => isLuaCode(s.code || s.title));
-    const removedCount = initialCount - publicScripts.length;
-    
-    renderHub();
-    alert(`🧹 ลบข้อความขยะที่ไม่ใช่โค้ดออกเรียบร้อยแล้วทั้งหมด ${removedCount} รายการ!`);
+// 🧹 ระบบสแกนและลบข้อความที่ไม่ใช่โค้ดออกจาก Server
+async function cleanNonCodePublic() {
+    const btn = document.querySelector('.btn-clean');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังสแกนลบ...';
+    btn.disabled = true;
+
+    try {
+        const badScripts = publicScripts.filter(s => !isLuaCode(s.code || s.title));
+
+        if (badScripts.length === 0) {
+            alert('✅ ไม่พบรายการขยะในระบบครับ');
+            return;
+        }
+
+        let removedCount = 0;
+        for (const item of badScripts) {
+            if (item.id) {
+                await fetch(`/api/delete?id=${item.id}`, { method: 'DELETE' });
+                removedCount++;
+            }
+        }
+
+        await loadPublicHub();
+        alert(`🧹 ลบข้อความขยะออกจากฐานข้อมูลเรียบร้อยแล้วทั้งหมด ${removedCount} รายการ!`);
+
+    } catch (err) {
+        alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อเพื่อลบข้อมูล');
+        console.error(err);
+    } finally {
+        btn.innerHTML = '<i class="fa-solid fa-broom"></i> สแกนและลบรายการที่ไม่ใช่โค้ด';
+        btn.disabled = false;
+    }
 }
 
 function renderHub() {
@@ -438,9 +458,7 @@ function renderHub() {
     if (filtered.length === 0) {
         list.innerHTML = '<div style="text-align:center; color:var(--text-sub); padding:20px;">No public scripts found.</div>';
         return;
-    }
-
-    filtered.forEach(item => {
+     filtered.forEach(item => {
         const div = document.createElement('div');
         div.className = 'hub-item';
         div.innerHTML = `
@@ -474,4 +492,5 @@ async function copyHubLoadstring(id, btn) {
 }
 </script>
 </body>
-</html>
+    </html>
+    
