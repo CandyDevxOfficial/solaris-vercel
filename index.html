@@ -153,6 +153,15 @@
         }
         .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255, 87, 34, 0.6); }
 
+        .btn-clean {
+            width: 100%; background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4); color: #ff8888;
+            border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 700;
+            cursor: pointer; margin-bottom: 15px; transition: all 0.25s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-clean:hover { background: var(--danger); color: #fff; }
+
         .search-box { margin-bottom: 20px; position: relative; }
         .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); }
         .search-box input { padding-left: 40px; }
@@ -265,6 +274,8 @@
 
         <!-- PUBLIC HUB TAB -->
         <div id="tab-hub" class="tab-content">
+            <button class="btn-clean" onclick="cleanNonCodePublic()"><i class="fa-solid fa-broom"></i> สแกนและลบรายการที่ไม่ใช่โค้ด</button>
+            
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="searchInput" placeholder="Search scripts or games..." oninput="renderHub()">
@@ -278,6 +289,23 @@
 <div class="toast" id="toast">Copied to Clipboard!</div>
 
 <script>
+// ==================== ระบบตรวจสอบว่าข้อความใช่โค้ดหรือไม่ ====================
+function isLuaCode(text) {
+    if (!text || text.trim().length === 0) return false;
+    
+    // คีย์เวิร์ดโครงสร้าง Lua & Roblox Script
+    const luaKeywords = [
+        "local ", "function", "end", "return", "if ", "then", "else", 
+        "game:", "game.", "workspace", "Instance.new", "Vector3", 
+        "CFrame", "wait(", "task.wait", "require(", "print(", "=", "getgenv", "loadstring"
+    ];
+
+    const hasKeywords = luaKeywords.some(keyword => text.includes(keyword));
+    const hasCodeSymbols = /[{}()\[\]=+\-*/;:.]/.test(text);
+
+    return hasKeywords || hasCodeSymbols;
+}
+
 function toggleCustomGameInput() {
     const select = document.getElementById('scriptGame');
     const customBox = document.getElementById('customGameBox');
@@ -292,7 +320,6 @@ function clearCustomCategory() {
     const customInput = document.getElementById('customGameInput');
     const select = document.getElementById('scriptGame');
     
-    // ล้างข้อความ พลิกกลับไปเลือก General และซ่อนช่องกรอก
     customInput.value = '';
     select.value = 'General';
     toggleCustomGameInput();
@@ -335,7 +362,14 @@ async function createRaw() {
     const code = document.getElementById('rawCode').value.trim();
     const isPublic = document.getElementById('isPublic').checked;
 
-    if (!code) return alert('Please enter code.');
+    // ❌ ตรวจเช็กก่อนส่ง: ถ้าไม่ใช่โค้ดจะเด้งปฏิเสธทันที
+    if (!code) {
+        return alert('กรุณาใส่โค้ดสคริปต์!');
+    }
+    
+    if (!isLuaCode(code)) {
+        return alert('❌ Error: ข้อมูลที่พิมพ์ไม่ใช่โค้ดสคริปต์! ระบบอนุญาตให้ส่งเฉพาะโค้ดสคริปต์เท่านั้น');
+    }
 
     const btn = document.getElementById('convertBtn');
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
@@ -379,6 +413,17 @@ async function loadPublicHub() {
     } catch (err) {
         console.error(err);
     }
+}
+
+// 🧹 ระบบสแกนและลบข้อความที่ไม่ใช่โค้ดออกจาก Public Hub
+function cleanNonCodePublic() {
+    const initialCount = publicScripts.length;
+    // กรองเอาเฉพาะสคริปต์ที่เป็นโค้ดแท้จริง
+    publicScripts = publicScripts.filter(s => isLuaCode(s.code || s.title));
+    const removedCount = initialCount - publicScripts.length;
+    
+    renderHub();
+    alert(`🧹 ลบข้อความขยะที่ไม่ใช่โค้ดออกเรียบร้อยแล้วทั้งหมด ${removedCount} รายการ!`);
 }
 
 function renderHub() {
@@ -429,5 +474,4 @@ async function copyHubLoadstring(id, btn) {
 }
 </script>
 </body>
-    </html>
-    
+</html>
